@@ -1,0 +1,101 @@
+---
+title: 'Cyclists Case Study1 How do we Increase Casual to Annual Membership Conversion'
+author: "Aarav De"
+date: "2023-02-14"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<h2>Cyclists Case Study1: Casual to Annual Membership Conversion</h2>
+Hello, we are undergoing a process known as conversion to already active clients who use Cyclysts. We want more annual memberships from our already growing client base and we believe we can achieve it through clients who are Casual and not apart of the membership program with Cyclists and Chicago.
+```{r}
+install.packages("tidyverse")
+library(tidyverse)
+cyclists_trips <- read_csv("/cloud/project/Case Study 1_ Cyclistics from Casual to Annual memberships - Divvy_Trips_2020_Q1.csv")
+colnames(cyclists_trips)
+```
+We'll show a comparison of where a client start's their trip using Devvi, and where the client end's his trip and compare it between annual membership and casual membership, that way we can see where casual members usually start and end their trips.
+
+<h3>Client Start Trips</h3>
+```{r}
+ggplot(data =cyclists_trips)+geom_bar(mapping=aes(x=start_station_id, color=member_casual))+facet_wrap(~member_casual)+labs(title="Start Rides by Station ID", subtitle = "by Start Station", caption = "station id 192 has 7813 start occurances, [2020_Q1]")
+```
+<h3>Client End Trips</h3>
+```{r}
+ggplot(data = cyclists_trips) + geom_bar(mapping = aes(x=end_station_id, color = member_casual)) + facet_wrap(~member_casual) + labs(title="Rides Ended between Casual and Annual Members", subtitle ="by station ID", caption = "station id 192 has 8323 End Station occurances, [2020_Q1]")
+```
+<h3>where can we find our data</h3>
+Our data is stored on the server and can be viewed at any time
+https://divvy-tripdata.s3.amazonaws.com/index.html
+
+<h3>We have a small number of Casual Ride's and we want to Get them to Annual Membership</h3>
+It's safe to assume that we can easily accomplish this, but nothing is so easy. With the two comparing charts of Annual and Casual members, we can conclude that this will be much easier than anticipated, given that these targetted members become Annual.
+
+We can assume that we should target these rider's by their start and end station ID's with targetted ads. By use of where the data comes from, Divvy, we can use this data safely and use it freely, because they are open source as well.
+
+<h4>how is the data organized</h4>
+the data is organized by end_station_id and end_station_name
+
+<h4>is the data reliable, original, current, comprehensive, and cited</h4>
+The data recieves a 9/10, the only problem is the start_station_id and start_station_name not being matched as well as end_station_id and end_station_name. I believe it has to do with their algorithm, but for accuracy, stick to identification and identifying each instance using the ride ID or the end_station_name and/or end_station_id if you want to target an area for advertising.
+
+<h4>Accessibility</h4>
+Divvy is a chicago company with ride's reaching 8000 for the year, for one station, this is excellent. we give out thanks to divvy for the data
+
+<h4>data integrity</h4>
+The data is excellent and it seems that the algorithm has labeled start_station_id by it's name incorrectly. I suppose the data is excellent, only at the end_station_name and end_station_id side of things
+I was hesitant with the data once I saw the Data Start_station_id's and start_station_names produces some conflicting validation - the start_station_id and Start_station_names dont match as end_station_names and end_station_id's
+
+We will focus on the data by the end station Id only, and if needed, start_station_id, that way we can easier pinpoint any problems that need to be addressed.
+
+<h4>Problems and Issues with the data</h4>
+However, I did run into some issues.
+  The data start_station_name are not consistent with start_station_ids
+  we are uncertain if it is the intention of the company do that with the code which i believe is not a problem, but for accuracy and consistency, the mismatch between start_station_ids and start_station_names could be a challenge
+
+<h4>How these Chart's will solve and answer our question</h4>
+If we look at each chart, we can easily identify that the number of Annual membership rides' vs. the casual membership rides' easily out-number the casual membership rider. This is because casual membership rider's are smaller in number. We can focus and ask our marketing team to display or target ad's to our clients by location of end_station_id and see if they will convert to Annual membership.
+
+
+<h2>Data sources used: 2020 Q1, 2019 Q4, 2019 Q3, 2019 Q2</h2>
+We displayed only 2020 Q1 in our earlier chart's because that's where our current is. Below we have charts from all 4 Quarters. Here is the Joined data from bigquery
+
+<h4>Tools we are using</h4>
+we are using SQL bigquery to JOIN the files
+we are using Tableau to also JOIN the files to create a chart
+we are using RStudio Cloud to create a HTML,PDF report
+
+<h4>Have we ensured the Data's integrity?</h4>
+Yes we have insured the data's integrity by understanding this is data well acquired and can be used
+
+<h4>What steps have we taken to make sure the data is clean</h4>
+we trust the data is clean and accurate as possible. However, we checked each value by column per dataset to check for errors using the filter function in excel or spreadsheets. The Filter function will tell you each value and if there are data cells that need to be cleaned
+
+<h4>Have you documented your cleaning process so you can share it with others</h4>
+No we have not because the data is accurate and the company has intentions with it that they seem will be fitting and benefit the company, however, we will clean and request each to be fitted with a more easily understandable data set that they may see to adopt into their practices
+
+
+
+<h4>Analysis</h4>
+How do casual members and annual membership use their bikes differently: the answer is in the amount of time they use the bike service and when they use it. We often see casual bike member's use their bike's less than annual members.
+
+```{r}
+ggplot(data = cyclists_trips) + geom_point(mapping = aes(x=start_station_id, y=ride_length, color = member_casual)) + facet_wrap(~member_casual) + labs(title="Ride Length by Station ID")
+```
+
+<h2>How do annual members and casual riders use Cyclistic bikes diffrently?</h2>
+Casual and Annual members differ in the amount of time they use the bicycle by ride length, however, because there are fewer rides ended by casual riders', casual rider's do not have the membership and are seen to use the bikes longer.
+
+<h4>what does the story of the data tell</h4>
+The story of the data tells that casual rider's are using the bikes longer and less often than annual membership rider's who use the bikes more often but for shorter ride lengths
+
+<h4>how does your findings relate to your original question</h4>
+My findings relate to the original question because we found out casual riders use the bikes for longer based on bike_station_id and less than annual members
+
+<h4>our audience is our stakeholders</h4>
+so please enjoy this, the graphs are the best way to enjoy the data
