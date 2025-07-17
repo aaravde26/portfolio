@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Savings Calculator</title>
+    <style>
+        /* Basic CSS for better readability and responsiveness */
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"],
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: calc(100% - 22px); /* Account for padding and border */
+            padding: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ddd;
+            border-radius: 8px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding in width */
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer;
+            font-size: 17px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            display: block; /* Make button take full width in small screens */
+            width: 100%; /* Full width for better touch targets */
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .section {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px; /* Rounded corners */
+            background-color: #fcfcfc;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .item-row {
+            display: flex;
+            gap: 12px; /* Increased gap for spacing */
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            padding: 10px;
+            background-color: #f0f8ff; /* Light background for each row */
+            border-radius: 8px;
+            border: 1px solid #e6f2ff;
+        }
+        .item-row input, .item-row select {
+            flex: 1; /* Distributes space */
+            min-width: 100px; /* Minimum width for inputs */
+            margin-bottom: 0; /* Remove extra margin */
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 0; /* Override default button margin */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: auto; /* Allow button to size naturally */
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+        .remove-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 0px 1px rgba(0, 0, 0, 0.1);
+        }
+        #results {
+            margin-top: 35px;
+            padding: 25px;
+            background-color: #e9f5ff; /* Lighter blue for results */
+            border-radius: 10px; /* Rounded corners */
+            border: 1px solid #cce0ff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        #results h3 {
+            color: #004085;
+            margin-top: 0;
+            text-align: left;
+        }
+        #results ul {
+            list-style: none;
+            padding: 0;
+        }
+        #results ul li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #aed6f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05em;
+        }
+        #results ul li:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            color: #0056b3;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .item-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .item-row input, .item-row select, .remove-btn {
+                width: 100%;
+                min-width: unset; /* Remove min-width constraint */
+            }
+            button {
+                padding: 10px 15px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Savings Projection Calculator</h1>
+
+        <div class="section">
+            <h2>Current Savings & Projection Period</h2>
+            <label for="initialSavings">Starting Savings Amount ($):</label>
+            <input type="number" id="initialSavings" value="10000" min="0">
+
+            <label for="currentDate">As of Date (when is your initial savings amount accurate?):</label>
+            <input type="date" id="currentDate">
+
+            <label for="projectionMonths">Project for (months):</label>
+            <input type="number" id="projectionMonths" value="12" min="1" max="60">
+        </div>
+
+        <div class="section">
+            <h2>Income</h2>
+            <div id="incomeContainer">
+                <!-- Initial income row -->
+                <div class="item-row">
+                    <input type="text" placeholder="Description (e.g., Salary)" class="income-desc">
+                    <input type="number" placeholder="Amount ($)" class="income-amount" min="0">
+                    <select class="income-frequency">
+                        <option value="monthly">Monthly</option>
+                        <option value="bi-weekly">Bi-Weekly</option>
+                    </select>
+                    <input type="date" class="income-start-date" title="When does this income start?">
+                    <input type="date" class="income-end-date" title="Optional: When does this income end?">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                </div>
+            </div>
+            <button type="button" id="addIncome">Add Another Income</button>
+        </div>
+
+        <div class="section">
+            <h2>Scheduled Payments</h2>
+            <div id="scheduledPaymentsContainer">
+                <!-- Initial scheduled payment row -->
+                <div class="item-row">
+                    <input type="text" placeholder="Description (e.g., Rent)" class="payment-desc">
+                    <input type="number" placeholder="Amount ($)" class="payment-amount" min="0">
+                    <input type="number" placeholder="Due Day (1-31)" class="payment-due-day" min="1" max="31">
+                    <select class="payment-frequency">
+                        <option value="monthly">Monthly</option>
+                        <option value="bi-weekly">Bi-Weekly</option>
+                        <option value="annually">Annually</option>
+                    </select>
+                    <input type="date" class="payment-start-date" title="When does this payment start?">
+                    <input type="date" class="payment-end-date" title="Optional: When does this payment end?">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                </div>
+            </div>
+            <button type="button" id="addScheduledPayment">Add Another Scheduled Payment</button>
+        </div>
+
+        <div class="section">
+            <h2>Additional Theoretical Monthly Expenses</h2>
+            <div id="theoreticalExpensesContainer">
+                <!-- Initial theoretical expense row -->
+                <div class="item-row">
+                    <input type="text" placeholder="Description (e.g., Dining Out)" class="expense-desc">
+                    <input type="number" placeholder="Estimated Monthly Amount ($)" class="expense-amount" min="0">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                </div>
+            </div>
+            <button type="button" id="addTheoreticalExpense">Add Another Theoretical Expense</button>
+        </div>
+
+        <button id="calculateSavings">Calculate Savings</button>
+
+        <div id="results">
+            <h3>Projected Savings Balance:</h3>
+            <ul id="projectionList">
+                <!-- Results will be displayed here by JavaScript -->
+                <li>Enter your details and click 'Calculate Savings'.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Get DOM Elements ---
+            const addScheduledPaymentBtn = document.getElementById('addScheduledPayment');
+            const scheduledPaymentsContainer = document.getElementById('scheduledPaymentsContainer');
+            const addTheoreticalExpenseBtn = document.getElementById('addTheoreticalExpense');
+            const theoreticalExpensesContainer = document.getElementById('theoreticalExpensesContainer');
+            const addIncomeBtn = document.getElementById('addIncome'); // New income button
+            const incomeContainer = document.getElementById('incomeContainer'); // New income container
+            const calculateSavingsBtn = document.getElementById('calculateSavings');
+            const projectionList = document.getElementById('projectionList');
+            const currentDateInput = document.getElementById('currentDate');
+
+            // --- Set initial 'As of Date' to today ---
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' +
+                             String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                             String(today.getDate()).padStart(2, '0');
+            currentDateInput.value = todayStr;
+
+            // --- Helper Function: Get days in a specific month ---
+            function getDaysInMonth(year, month) {
+                // Month is 0-indexed for Date constructor (0 for Jan, 11 for Dec)
+                // Passing 0 as day gets the last day of the *previous* month
+                return new Date(year, month + 1, 0).getDate();
+            }
+
+            // --- Function to add a new scheduled payment input row dynamically ---
+            function addScheduledPaymentRow() {
+                const newRow = document.createElement('div');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <input type="text" placeholder="Description (e.g., Rent)" class="payment-desc">
+                    <input type="number" placeholder="Amount ($)" class="payment-amount" min="0">
+                    <input type="number" placeholder="Due Day (1-31)" class="payment-due-day" min="1" max="31">
+                    <select class="payment-frequency">
+                        <option value="monthly">Monthly</option>
+                        <option value="bi-weekly">Bi-Weekly</option>
+                        <option value="annually">Annually</option>
+                    </select>
+                    <input type="date" class="payment-start-date" title="When does this payment start?">
+                    <input type="date" class="payment-end-date" title="Optional: When does this payment end?">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                `;
+                scheduledPaymentsContainer.appendChild(newRow);
+            }
+
+            // --- Function to add a new theoretical expense input row dynamically ---
+            function addTheoreticalExpenseRow() {
+                const newRow = document.createElement('div');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <input type="text" placeholder="Description (e.g., Dining Out)" class="expense-desc">
+                    <input type="number" placeholder="Estimated Monthly Amount ($)" class="expense-amount" min="0">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                `;
+                theoreticalExpensesContainer.appendChild(newRow);
+            }
+
+            // --- Function to add a new income input row dynamically ---
+            function addIncomeRow() {
+                const newRow = document.createElement('div');
+                newRow.className = 'item-row';
+                newRow.innerHTML = `
+                    <input type="text" placeholder="Description (e.g., Salary)" class="income-desc">
+                    <input type="number" placeholder="Amount ($)" class="income-amount" min="0">
+                    <select class="income-frequency">
+                        <option value="monthly">Monthly</option>
+                        <option value="bi-weekly">Bi-Weekly</option>
+                    </select>
+                    <input type="date" class="income-start-date" title="When does this income start?">
+                    <input type="date" class="income-end-date" title="Optional: When does this income end?">
+                    <button type="button" class="remove-btn" onclick="this.closest('.item-row').remove()">Remove</button>
+                `;
+                incomeContainer.appendChild(newRow);
+            }
+
+            // --- Event Listeners for Add Buttons ---
+            addScheduledPaymentBtn.addEventListener('click', addScheduledPaymentRow);
+            addTheoreticalExpenseBtn.addEventListener('click', addTheoreticalExpenseRow);
+            addIncomeBtn.addEventListener('click', addIncomeRow); // New income event listener
+
+            // --- Main Calculation Logic triggered by 'Calculate Savings' button ---
+            calculateSavingsBtn.addEventListener('click', function() {
+                let initialSavings = parseFloat(document.getElementById('initialSavings').value) || 0;
+                const projectionMonths = parseInt(document.getElementById('projectionMonths').value) || 0;
+                // Parse the 'As of Date' and normalize to start of day (UTC to avoid timezone issues)
+                const startDateInput = new Date(document.getElementById('currentDate').value + 'T00:00:00');
+                startDateInput.setHours(0, 0, 0, 0); // Ensure consistent start of day
+
+                // --- Input Validation ---
+                if (isNaN(startDateInput.getTime())) {
+                    alert("Please enter a valid 'As of Date'.");
+                    return;
+                }
+                if (projectionMonths <= 0) {
+                    alert("Please enter a valid number of months to project (1 or more).");
+                    return;
+                }
+
+                // --- Clear previous results and display initial state ---
+                projectionList.innerHTML = '';
+                projectionList.innerHTML += `<li><span>Initial Savings (${startDateInput.toLocaleDateString()}):</span> <span>$${initialSavings.toFixed(2)}</span></li>`;
+
+                // --- 1. Collect Income Data ---
+                const incomes = [];
+                document.querySelectorAll('#incomeContainer .item-row').forEach(row => {
+                    const desc = row.querySelector('.income-desc').value.trim();
+                    const amount = parseFloat(row.querySelector('.income-amount').value) || 0;
+                    const frequency = row.querySelector('.income-frequency').value;
+                    const incomeStartDateStr = row.querySelector('.income-start-date').value;
+                    const incomeEndDateStr = row.querySelector('.income-end-date').value;
+
+                    const incomeStartDate = incomeStartDateStr ? new Date(incomeStartDateStr + 'T00:00:00') : startDateInput;
+                    incomeStartDate.setHours(0,0,0,0);
+
+                    const incomeEndDate = incomeEndDateStr ? new Date(incomeEndDateStr + 'T00:00:00') : new Date(startDateInput.getFullYear() + projectionMonths / 12 + 5, 0, 1);
+                    incomeEndDate.setHours(0,0,0,0);
+
+                    if (desc && amount > 0) {
+                        const income = {
+                            description: desc,
+                            amount: amount,
+                            frequency: frequency,
+                            startDate: incomeStartDate,
+                            endDate: incomeEndDate,
+                            nextDue: null
+                        };
+
+                        if (income.frequency === 'bi-weekly') {
+                            let tempDate = new Date(income.startDate.getTime());
+                            tempDate.setHours(0,0,0,0);
+                            while (tempDate < startDateInput) {
+                                tempDate.setDate(tempDate.getDate() + 14);
+                                tempDate.setHours(0,0,0,0);
+                            }
+                            income.nextDue = tempDate;
+                        }
+                        incomes.push(income);
+                    } else if (desc || amount > 0) {
+                        console.warn(`Skipping incomplete income entry: ${desc}, ${amount}`);
+                    }
+                });
+
+                // --- 2. Collect Scheduled Payments Data ---
+                const scheduledPayments = [];
+                document.querySelectorAll('#scheduledPaymentsContainer .item-row').forEach(row => {
+                    const desc = row.querySelector('.payment-desc').value.trim();
+                    const amount = parseFloat(row.querySelector('.payment-amount').value) || 0;
+                    const dueDay = parseInt(row.querySelector('.payment-due-day').value); // Can be NaN if empty/invalid
+
+                    const frequency = row.querySelector('.payment-frequency').value;
+                    const paymentStartDateStr = row.querySelector('.payment-start-date').value;
+                    const paymentEndDateStr = row.querySelector('.payment-end-date').value;
+
+                    // Parse payment start/end dates, normalize to start of day
+                    const paymentStartDate = paymentStartDateStr ? new Date(paymentStartDateStr + 'T00:00:00') : startDateInput;
+                    paymentStartDate.setHours(0,0,0,0);
+
+                    // Default end date far into the future if not provided
+                    const paymentEndDate = paymentEndDateStr ? new Date(paymentEndDateStr + 'T00:00:00') : new Date(startDateInput.getFullYear() + projectionMonths / 12 + 5, 0, 1);
+                    paymentEndDate.setHours(0,0,0,0);
+
+                    // Basic validation for payment entries
+                    if (desc && amount > 0 && !isNaN(dueDay) && dueDay >= 1 && dueDay <= 31) {
+                        const payment = {
+                            description: desc,
+                            amount: amount,
+                            dueDay: dueDay,
+                            frequency: frequency,
+                            startDate: paymentStartDate,
+                            endDate: paymentEndDate,
+                            nextDue: null // To track the next due date for bi-weekly/annual payments
+                        };
+
+                        // Initialize nextDue for bi-weekly/annual payments to the first occurrence on or after startDateInput
+                        if (payment.frequency === 'bi-weekly') {
+                            let tempDate = new Date(payment.startDate.getTime());
+                            tempDate.setHours(0,0,0,0);
+                            // Advance tempDate until it's >= startDateInput and maintains its bi-weekly cycle
+                            while (tempDate < startDateInput) {
+                                tempDate.setDate(tempDate.getDate() + 14);
+                                tempDate.setHours(0,0,0,0); // Normalize after date manipulation
+                            }
+                            payment.nextDue = tempDate; // This is the first date it's due in our projection
+                        } else if (payment.frequency === 'annually') {
+                            let tempDate = new Date(payment.startDate.getTime());
+                            tempDate.setHours(0,0,0,0);
+                            // Advance tempDate until it's >= startDateInput and maintains its annual cycle
+                            while (tempDate < startDateInput) {
+                                tempDate.setFullYear(tempDate.getFullYear() + 1);
+                                tempDate.setHours(0,0,0,0); // Normalize after date manipulation
+                            }
+                            payment.nextDue = tempDate;
+                        }
+                        scheduledPayments.push(payment);
+                    } else if (desc || amount > 0 || !isNaN(dueDay)) { // Warn if partially filled
+                        console.warn(`Skipping incomplete scheduled payment entry: ${desc}, ${amount}, ${dueDay}`);
+                    }
+                });
+
+                // --- 3. Collect Theoretical Monthly Expenses Data ---
+                let totalTheoreticalMonthlyExpense = 0;
+                document.querySelectorAll('#theoreticalExpensesContainer .item-row').forEach(row => {
+                    const amount = parseFloat(row.querySelector('.expense-amount').value) || 0;
+                    if (amount > 0) {
+                        totalTheoreticalMonthlyExpense += amount;
+                    }
+                });
+
+                // --- 4. Perform Day-by-Day Calculation ---
+                let currentSavings = initialSavings;
+                let currentProjectedDate = new Date(startDateInput.getTime()); // Start calculation from the specified 'As of Date'
+
+                // Track when the last theoretical expense was applied to ensure it's once per calendar month
+                let lastTheoreticalExpenseMonth = currentProjectedDate.getMonth();
+                let lastTheoreticalExpenseYear = currentProjectedDate.getFullYear();
+
+                // Calculate the end date of the projection period
+                // This date is the end of the month 'projectionMonths' after startDateInput's month
+                const projectionEndDate = new Date(startDateInput.getFullYear(), startDateInput.getMonth() + projectionMonths, 0); // Last day of the target month
+                projectionEndDate.setHours(0,0,0,0);
+
+
+                // Loop through days for more accurate calculation, especially for bi-weekly/annual and mid-month start
+                // We loop slightly beyond the projection end to ensure all payments/expenses are captured
+                const maxDaysToLoop = projectionMonths * 31 + 31; // Max days in projection period + one extra month buffer
+                for (let dayCount = 0; dayCount < maxDaysToLoop; dayCount++) {
+                    // Stop if we've gone beyond the projection period's end date
+                    if (currentProjectedDate > projectionEndDate) {
+                        break;
+                    }
+
+                    const currentDayOfMonth = currentProjectedDate.getDate();
+                    const currentMonth = currentProjectedDate.getMonth();
+                    const currentYear = currentProjectedDate.getFullYear();
+
+                    // --- Apply Income for the current day ---
+                    incomes.forEach(income => {
+                        if (currentProjectedDate >= income.startDate && currentProjectedDate <= income.endDate && currentProjectedDate >= startDateInput) {
+                            let shouldReceiveIncome = false;
+
+                            if (income.frequency === 'monthly') {
+                                // For monthly income, assume it's received on the 1st of the month
+                                if (currentDayOfMonth === 1) { // Assuming monthly income is received on the 1st
+                                    shouldReceiveIncome = true;
+                                }
+                            } else if (income.frequency === 'bi-weekly') {
+                                if (income.nextDue && currentProjectedDate.getTime() === income.nextDue.getTime()) {
+                                    shouldReceiveIncome = true;
+                                    income.nextDue.setDate(income.nextDue.getDate() + 14);
+                                    income.nextDue.setHours(0,0,0,0);
+                                }
+                            }
+
+                            if (shouldReceiveIncome) {
+                                currentSavings += income.amount;
+                                // console.log(`Received ${income.description} ($${income.amount.toFixed(2)}) on ${currentProjectedDate.toLocaleDateString()}`); // Debugging
+                            }
+                        }
+                    });
+
+                    // --- Apply Scheduled Payments for the current day ---
+                    scheduledPayments.forEach(payment => {
+                        // Check if payment is active within its start/end dates AND on or after the overall projection start date
+                        if (currentProjectedDate >= payment.startDate && currentProjectedDate <= payment.endDate && currentProjectedDate >= startDateInput) {
+                            let shouldPay = false;
+
+                            if (payment.frequency === 'monthly') {
+                                // Calculate the actual due day for the current month, handling month-end variations (e.g., Feb 30th)
+                                const daysInCurrentMonth = getDaysInMonth(currentYear, currentMonth);
+                                const effectiveDueDay = Math.min(payment.dueDay, daysInCurrentMonth);
+
+                                if (currentDayOfMonth === effectiveDueDay) {
+                                    shouldPay = true;
+                                }
+                            } else if (payment.frequency === 'bi-weekly') {
+                                // Check if the current projected date matches the next expected payment date for this bi-weekly payment
+                                if (payment.nextDue && currentProjectedDate.getTime() === payment.nextDue.getTime()) {
+                                    shouldPay = true;
+                                    // Set the next due date for this payment
+                                    payment.nextDue.setDate(payment.nextDue.getDate() + 14);
+                                    payment.nextDue.setHours(0,0,0,0); // Normalize after date manipulation
+                                }
+                            } else if (payment.frequency === 'annually') {
+                                // Check if the current projected date matches the next expected payment date for this annual payment
+                                if (payment.nextDue && currentProjectedDate.getTime() === payment.nextDue.getTime()) {
+                                    shouldPay = true;
+                                    // Set the next due date for this payment
+                                    payment.nextDue.setFullYear(payment.nextDue.getFullYear() + 1);
+                                    payment.nextDue.setHours(0,0,0,0); // Normalize after date manipulation
+                                }
+                            }
+
+                            if (shouldPay) {
+                                currentSavings -= payment.amount;
+                                // console.log(`Deducted ${payment.description} ($${payment.amount.toFixed(2)}) on ${currentProjectedDate.toLocaleDateString()}`); // Debugging line
+                            }
+                        }
+                    });
+
+                    // --- Apply Theoretical Monthly Expenses at the end of each calendar month ---
+                    // This logic ensures it's applied once per calendar month.
+                    // We check if the month has changed OR if it's the last day of the projection and the month hasn't been recorded.
+                    const isEndOfMonth = (currentDayOfMonth === getDaysInMonth(currentYear, currentMonth));
+                    const isLastDayOfProjection = currentProjectedDate.getTime() === projectionEndDate.getTime();
+
+                    // Check if the month has changed, or if it's the last day of the projection and we're in the same month
+                    if (currentProjectedDate.getMonth() !== lastTheoreticalExpenseMonth || currentProjectedDate.getFullYear() !== lastTheoreticalExpenseYear || isLastDayOfProjection) {
+                        // Only apply if we've passed the initial 'As of Date'
+                        if (currentProjectedDate >= startDateInput) {
+                            currentSavings -= totalTheoreticalMonthlyExpense;
+                            const displayMonthYear = new Date(lastTheoreticalExpenseYear, lastTheoreticalExpenseMonth, 1).toLocaleString('en-US', { month: 'long', year: 'numeric'});
+                            projectionList.innerHTML += `<li><span>End of ${displayMonthYear}:</span> <span>$${currentSavings.toFixed(2)}</span></li>`;
+                        }
+                        lastTheoreticalExpenseMonth = currentMonth;
+                        lastTheoreticalExpenseYear = currentYear;
+                    }
+
+
+                    // Move to the next day
+                    currentProjectedDate.setDate(currentProjectedDate.getDate() + 1);
+                }
+
+                // Display the final projected balance
+                projectionList.innerHTML += `<li><span>Projected Final Balance:</span> <span>$${currentSavings.toFixed(2)}</span></li>`;
+
+                if (projectionMonths === 0) {
+                    projectionList.innerHTML = `<li>No projection period specified.</li>`;
+                } else if (initialSavings === 0 && scheduledPayments.length === 0 && totalTheoreticalMonthlyExpense === 0 && incomes.length === 0) {
+                    projectionList.innerHTML += `<li>No income, expenses or payments defined.</li>`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
